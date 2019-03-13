@@ -1,13 +1,14 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input,OnDestroy } from '@angular/core';
 
 import {PostModel } from '../post.model';
-
+import { PostsService } from '../posts.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-post-list',
   templateUrl: './post-list.component.html',
   styleUrls: ['./post-list.component.css']
 })
-export class PostListComponent implements OnInit {
+export class PostListComponent implements OnInit,OnDestroy {
 
   // posts=[
   //   {title:'first post',content:'hituuuu'},
@@ -15,12 +16,29 @@ export class PostListComponent implements OnInit {
   //   {title:'first post',content:'hituuuu'}
   // ]
 
-  @Input()  posts:PostModel[]=[];
+  //to get data from parent component using property binding which is replaced by services
+  //@Input()  posts:PostModel[]=[];
 
- 
-  constructor() { }
+  posts:PostModel[]=[];
+  private subscriptionForPosts:Subscription;
+
+  serviceForPosts:PostsService;
+
+  constructor(serviceForPostsArgument:PostsService) {
+    this.serviceForPosts=serviceForPostsArgument;
+   }
+
 
   ngOnInit() {
+    this.posts=this.serviceForPosts.getPosts();
+    this.subscriptionForPosts=this.serviceForPosts.getPostUpdatedListener()
+    .subscribe((postsUpdated:PostModel[])=>{
+      this.posts=postsUpdated;
+    });
+  }
+
+  ngOnDestroy(){
+    this.subscriptionForPosts.unsubscribe();
   }
 
 }

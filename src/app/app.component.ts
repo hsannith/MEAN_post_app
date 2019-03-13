@@ -8,10 +8,12 @@ import { PostModel } from './posts/post.model';
 })
 export class AppComponent {
   title = 'MEAN';
-  createdPosts :PostModel[]=[]
-  onPostAdded(post){
-    this.createdPosts.push(post);
-  }
+
+  //app.comonent acted as a parent component for post create and post list and passed data between them using event emitters
+  // createdPosts :PostModel[]=[]
+  // onPostAdded(post){
+  //   this.createdPosts.push(post);
+  // }
 
 
 }
