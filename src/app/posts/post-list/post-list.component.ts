@@ -28,6 +28,8 @@ export class PostListComponent implements OnInit,OnDestroy {
     this.serviceForPosts=serviceForPostsArgument;
    }
 
+  
+
 
   ngOnInit() {
     this.serviceForPosts.getPosts();
@@ -36,6 +38,11 @@ export class PostListComponent implements OnInit,OnDestroy {
       this.posts=postsUpdated;
     });
   }
+
+  onDelete(id:string){
+    this.serviceForPosts.deletePost(id);
+
+   }
 
   ngOnDestroy(){
     this.subscriptionForPosts.unsubscribe();
