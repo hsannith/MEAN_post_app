@@ -56,4 +56,23 @@ export class PostsService{
             this.postUpdated.next([...this.posts]);
        })
    }
+
+   updatePost(post:PostModel){
+       const postupdt:PostModel={id:post.id,title:post.title,content:post.content};
+
+       this.http.put<{ message:string}>('http://localhost:3000/api/posts/'+post.id,post)
+       .subscribe( (response)=>{
+           console.log(response);
+           const updatedposts=[...this.posts];
+           const oldpostindex=updatedposts.findIndex(p=> p.id===postupdt.id);
+           updatedposts[oldpostindex]=postupdt;
+           this.posts=updatedposts;
+           this.postUpdated.next([...this.posts]);
+
+       })
+   }
+
+   getPost(id:string){
+       return this.http.get<{_id:string,title:string,content:string}>('http://localhost:3000/api/posts/'+id);
+   }
 }
