@@ -20,6 +20,7 @@ export class PostListComponent implements OnInit,OnDestroy {
   //@Input()  posts:PostModel[]=[];
 
   posts:PostModel[]=[];
+  isLoading=false;
   private subscriptionForPosts:Subscription;
 
   serviceForPosts:PostsService;
@@ -33,8 +34,10 @@ export class PostListComponent implements OnInit,OnDestroy {
 
   ngOnInit() {
     this.serviceForPosts.getPosts();
+    this.isLoading=true;
     this.subscriptionForPosts=this.serviceForPosts.getPostUpdatedListener()
     .subscribe((postsUpdated:PostModel[])=>{
+      this.isLoading=false;
       this.posts=postsUpdated;
     });
   }
