@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { type } from 'os';
 
 @Injectable()  //used if you inject some other service into this service
 export class PostsService{
@@ -20,7 +21,8 @@ export class PostsService{
                 return {
                     id:post._id,
                     title:post.title,
-                    content:post.content
+                    content:post.content,
+                    imagePath:post.imagePath
                 }
             })
        }))
@@ -35,12 +37,18 @@ export class PostsService{
        return this.postUpdated.asObservable();
    }
 
-   addPost(post:PostModel){
-    this.http.post<{message:string,createdpostid:string}>('http://localhost:3000/api/posts',post)
+   addPost(post:PostModel,image:File){
+       const PostData=new FormData();
+       PostData.append("title",post.title);
+       PostData.append("content",post.content);
+       PostData.append("image",image,post.title);
+
+    this.http.post<{message:string,post:PostModel}>('http://localhost:3000/api/posts',PostData)
     .subscribe((responsedata)=>{
         console.log(responsedata);
-        const createdPostId=responsedata.createdpostid;
+        const createdPostId=responsedata.post.id;
         post.id=createdPostId;
+        post.imagePath=responsedata.post.imagePath;
         this.posts.push(post);
          this.postUpdated.next([...this.posts]);
          this.router.navigate(["/"]);
@@ -58,14 +66,36 @@ export class PostsService{
        })
    }
 
-   updatePost(post:PostModel){
-       const postupdt:PostModel={id:post.id,title:post.title,content:post.content};
+   updatePost(post:PostModel,image:File | string){
+    let PostData : PostModel | FormData;  
 
-       this.http.put<{ message:string}>('http://localhost:3000/api/posts/'+post.id,post)
+    if(typeof(image)==='object'){
+            PostData=new FormData();
+            PostData.append("id",post.id);
+            PostData.append("title",post.title);
+            PostData.append("content",post.content);
+            PostData.append("image",image,post.title);
+        }
+        else{
+            PostData={
+                id:post.id,
+                title:post.title,
+                content:post.content,
+                imagePath:image
+            }
+
+        }
+       this.http.put<{ message:string,imagePath:string}>('http://localhost:3000/api/posts/'+post.id,PostData)
        .subscribe( (response)=>{
-           console.log(response);
+          // console.log(response);
            const updatedposts=[...this.posts];
-           const oldpostindex=updatedposts.findIndex(p=> p.id===postupdt.id);
+           const oldpostindex=updatedposts.findIndex(p=> p.id===post.id);
+           const postupdt:PostModel={
+               id:post.id,
+               title:post.title,
+               content:post.content,
+               imagePath:response.imagePath
+           }
            updatedposts[oldpostindex]=postupdt;
            this.posts=updatedposts;
            this.postUpdated.next([...this.posts]);
@@ -74,6 +104,6 @@ export class PostsService{
    }
 
    getPost(id:string){
-       return this.http.get<{_id:string,title:string,content:string}>('http://localhost:3000/api/posts/'+id);
+       return this.http.get<{_id:string,title:string,content:string,imagePath:string}>('http://localhost:3000/api/posts/'+id);
    }
 }
