@@ -74,12 +74,27 @@ router.put('/:id',multer({storage:storage}).single("image"),(req,res,next)=>{
 })
 
 router.get('',(req,res,next)=>{
-
-    Post.find()
-    .then(postsFromDB=>{
+    const pageSize=+req.query.pagesize;
+    const currentPage=+req.query.page;
+    const postQuery=Post.find();
+    let postFetchedWithPAginationFromDB;
+    //appending the mongo query with pagination conditions
+    if(pageSize && currentPage){
+        postQuery
+        .skip(pageSize *(currentPage-1))
+        .limit(pageSize);
+    }
+    
+    postQuery
+    .then(documents=>{
+        postFetchedWithPAginationFromDB=documents;
+        return Post.countDocuments()
+    })
+    .then(count=>{
         res.status(200).json({
             message:"posts fetched from server",
-            posts:postsFromDB
+            posts:postFetchedWithPAginationFromDB,
+            totalPosts:count
         });
     });
    
