@@ -55,9 +55,13 @@ export class AuthService{
             if(this.JWTtoken){
                 
                 const tokenExpiresInDuration=response.expiresIn;
-                this.tokenTimer=setTimeout(()=>{
-                    this.logout();
-                },tokenExpiresInDuration*1000);
+                
+                this.setAuthTimer(tokenExpiresInDuration);
+                const now=new Date();
+                const expirationDate=new Date(now.getTime()+tokenExpiresInDuration*1000);
+               
+                this.saveAuthData(this.JWTtoken,expirationDate);
+                //console.log(expirationDate);
 
                 this.isAuthenticated=true;
                 this.authStatusListener.next(true);
@@ -72,6 +76,54 @@ export class AuthService{
         this.isAuthenticated=false;
         this.authStatusListener.next(false);
         clearTimeout(this.tokenTimer);
+        this.clearAuthData();
         this.router.navigate(["/"]);
+    }
+
+    autoAuthUser(){
+        const authInfo=this.getAuthData();
+        if(!authInfo){
+            return;
+        }
+        const now=new Date();
+        const expiresIn=authInfo.expirationDate.getTime()-now.getTime();
+        console.log("expires in "+expiresIn)
+        if(expiresIn>0){
+            this.JWTtoken=authInfo.token;
+            this.isAuthenticated=true;
+            this.setAuthTimer(expiresIn/1000);
+            this.authStatusListener.next(true);
+        }
+    }
+
+
+    private saveAuthData(token:string,expirationData:Date){
+        localStorage.setItem('token',token);
+        localStorage.setItem('expiration',expirationData.toISOString());
+    }
+
+    private clearAuthData(){
+        localStorage.removeItem('token');
+        localStorage.removeItem('expiration');
+    }
+
+    private getAuthData(){
+        const token=localStorage.getItem('token');
+        const expirationDate=localStorage.getItem('expiration');
+    
+        if(!token || !expirationDate){
+            return;
+        }
+
+        return{
+            token:token,
+            expirationDate:new Date(expirationDate)
+        }
+    }
+
+    private setAuthTimer(duration:number){
+        this.tokenTimer=setTimeout(()=>{
+            this.logout();
+        },duration*1000);
     }
 }
