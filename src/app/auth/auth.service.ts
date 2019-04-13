@@ -9,6 +9,7 @@ export class AuthService{
 
     private JWTtoken:string;
     private isAuthenticated=false;
+    private tokenTimer:any;
     private authStatusListener=new Subject<boolean>();
 
     constructor(private http:HttpClient,private router:Router){
@@ -46,14 +47,22 @@ export class AuthService{
             password:password
         }
 
-        this.http.post<{jwt:string}>("http://localhost:3000/api/user/login",authdata).
+        this.http.post<{jwt:string,expiresIn:number}>("http://localhost:3000/api/user/login",authdata).
         subscribe(response=>{
 
             console.log(response.jwt);
             this.JWTtoken=response.jwt;
             if(this.JWTtoken){
+                
+                const tokenExpiresInDuration=response.expiresIn;
+                this.tokenTimer=setTimeout(()=>{
+                    this.logout();
+                },tokenExpiresInDuration*1000);
+
                 this.isAuthenticated=true;
                 this.authStatusListener.next(true);
+                this.router.navigate(["/"])
+
             }
         })
     }
@@ -62,6 +71,7 @@ export class AuthService{
         this.JWTtoken=null;
         this.isAuthenticated=false;
         this.authStatusListener.next(false);
-        this.router.navigate(["/"])
+        clearTimeout(this.tokenTimer);
+        this.router.navigate(["/"]);
     }
 }
