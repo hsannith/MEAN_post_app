@@ -9,7 +9,7 @@ import { NgForm } from '@angular/forms';
 })
 export class LoginComponent implements OnInit {
 
-  isLoading=false;
+  
   constructor(public authservice:AuthService) { }
 
   ngOnInit() {
@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
     if(form.invalid){
       return;
     }
+   
     this.authservice.login(form.value.email,form.value.password);
   }
 }

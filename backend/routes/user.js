@@ -11,8 +11,6 @@ router.post("/signup",(req,res,next)=>{
         password:req.body.password
     });
   
-    console.log("hitesh in sighhhhhnup");
-    console.log(user);
     user.save()
     .then(result=>{
         res.status(201).json({
@@ -21,7 +19,7 @@ router.post("/signup",(req,res,next)=>{
         });
     })
     .catch(err=>{
-        console.log("in error");
+        
         res.status(500).json({
             error:err
         })
@@ -38,7 +36,7 @@ router.post("/login",(req,res,next)=>{
             })
         }
 
-        if(!user.password===req.body.password){
+        if(user.password!==req.body.password){
             return res.status(401).json({
                 message:"Invalid email password"
             })
