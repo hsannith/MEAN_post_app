@@ -34,10 +34,14 @@ router.post('',checkAuth,multer({storage:storage}).single("image"),(req,res,next
     console.log(req);
     console.log(url+"/images/"+req.file.filename);
 
+    //user who has created the post is added in the request 
+    //in the middleware in field "userData" by decoding the token passed from front end
+    const postCreatorID=req.userData.userId;
     const post=new Post({
         title:req.body.title,
         content:req.body.content,
-        imagePath:url+"/images/"+req.file.filename
+        imagePath:url+"/images/"+req.file.filename,
+        creator:postCreatorID
     });
     
     console.log(post);

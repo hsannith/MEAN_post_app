@@ -13,6 +13,8 @@ export class AppComponent implements OnInit {
  
  
   ngOnInit(){
+    //check if the token is stored after refershing the page to
+    //provide access to authenicated user 
     this.authservice.autoAuthUser();
   }
   title = 'MEAN';

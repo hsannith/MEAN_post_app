@@ -87,7 +87,7 @@ export class AuthService{
         }
         const now=new Date();
         const expiresIn=authInfo.expirationDate.getTime()-now.getTime();
-        console.log("expires in "+expiresIn)
+        console.log("token expires in "+expiresIn/1000+" sec")
         if(expiresIn>0){
             this.JWTtoken=authInfo.token;
             this.isAuthenticated=true;
