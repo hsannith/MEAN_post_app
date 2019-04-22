@@ -6,6 +6,7 @@ import { PostsService } from '../posts.service';
 import { ActionSequence } from 'protractor';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { mimeType} from './mime-type.validator'
+import { AuthService } from 'src/app/auth/auth.service';
 @Component({
   selector: 'app-post-create',
   templateUrl: './post-create.component.html',
@@ -21,6 +22,7 @@ export class PostCreateComponent implements OnInit {
   imagePreview:string;
   private mode='create';
   private postId:string;
+  userId:string;
   
 
   //sending data using event emitter which is replaced by services later
@@ -38,7 +40,8 @@ export class PostCreateComponent implements OnInit {
         id:null,
         title:this.form.value.title,
         content:this.form.value.content,
-        imagePath:null
+        imagePath:null,
+        creator:this.userId
       }
       this.serviceForPosts.addPost(post,this.form.value.image);
     }
@@ -49,7 +52,9 @@ export class PostCreateComponent implements OnInit {
         id:this.postId,
         title:this.form.value.title,
         content:this.form.value.content,
-        imagePath:null
+        imagePath:null,
+        creator:this.userId
+
       }
      
       this.serviceForPosts.updatePost(post,this.form.value.image);
@@ -75,9 +80,10 @@ export class PostCreateComponent implements OnInit {
   }
 
 
-  constructor(public serviceForPosts:PostsService,public currentRoute:ActivatedRoute) { }
+  constructor(public serviceForPosts:PostsService,public currentRoute:ActivatedRoute,public authService:AuthService) { }
 
   ngOnInit() {
+    this.userId=this.authService.getUserId();
     this.form=new FormGroup({
       title:new FormControl(null,
         {
@@ -107,7 +113,8 @@ export class PostCreateComponent implements OnInit {
               id:postData._id,
               title:postData.title,
               content:postData.content,
-              imagePath:postData.imagePath
+              imagePath:postData.imagePath,
+              creator:postData.creator
             }
             this.form.setValue({
               title:this.post.title,
