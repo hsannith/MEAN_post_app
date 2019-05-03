@@ -16,7 +16,7 @@ module.exports=(req,res,next)=>{
     }
     catch(error){
         res.status(401).json({
-            message:"Authorization failed!"
+            message:"You are not aunthenticated!"
         })
     }
 

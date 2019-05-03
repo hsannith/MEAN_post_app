@@ -40,9 +40,12 @@ export class AuthService{
         }
         console.log(authdata);
         console.log("in sgnup");
-        this.http.post("http://localhost:3000/api/user/signup",authdata).
+        return this.http.post("http://localhost:3000/api/user/signup",authdata).
         subscribe(response=>{
             console.log(response);
+            this.router.navigate(["/"]);
+        },error=>{
+            this.authStatusListener.next(false);
         })
         
     }
@@ -74,6 +77,8 @@ export class AuthService{
                 this.router.navigate(["/"])
 
             }
+        },error=>{
+            this.authStatusListener.next(false);
         })
     }
 

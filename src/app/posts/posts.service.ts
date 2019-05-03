@@ -67,6 +67,7 @@ export class PostsService{
             PostData.append("title",post.title);
             PostData.append("content",post.content);
             PostData.append("image",image,post.title);
+            
         }
         else{
             PostData={

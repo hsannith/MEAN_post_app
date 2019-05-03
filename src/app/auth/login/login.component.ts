@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { NgForm } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -9,10 +10,19 @@ import { NgForm } from '@angular/forms';
 })
 export class LoginComponent implements OnInit {
 
-  
+  private authStatusSub:Subscription;
   constructor(public authservice:AuthService) { }
 
   ngOnInit() {
+    this.authStatusSub=this.authservice.getAuthStatusListener().subscribe(
+      authStatus=>{
+        
+      }
+    );
+  }
+
+  ngOnDestroy(){
+    this.authStatusSub.unsubscribe();
   }
 
   onLogin(form:NgForm){
